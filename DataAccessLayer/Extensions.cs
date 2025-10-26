@@ -1,4 +1,5 @@
-﻿using DataAccessLayer.Models;
+﻿using DataAccessLayer.Entities;
+using DataAccessLayer.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DataAccessLayer

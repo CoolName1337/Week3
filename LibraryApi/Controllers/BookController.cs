@@ -1,12 +1,13 @@
-﻿using LibraryApi.Dtos;
-using Microsoft.AspNetCore.Mvc;
-using BusinessLayer;
+﻿using Microsoft.AspNetCore.Mvc;
+using LibraryApi.ViewModels;
+using BusinessLayer.Dtos;
+using BusinessLayer.Services;
 
 namespace LibraryApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class BookController(IBookService bookService, IAuthorService authorService) : ControllerBase
+    public class BookController(IBookService bookService) : ControllerBase
     {
         [HttpGet("all")]
         public async Task<IActionResult> GetBooksAsync()
@@ -17,41 +18,27 @@ namespace LibraryApi.Controllers
         [Route("{id:int}")]
         public async Task<IActionResult> GetBookByIdAsync([FromRoute] int id)
         {
-            var author = await bookService.GetByIdAsync(id);
-            if (author is null)
-                return NotFound();
-            return Ok(author);
+            var res = await bookService.GetByIdAsync(id);
+            return Ok(res);
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostBookAsync([FromBody] BookDto bookDto)
+        public async Task<IActionResult> PostBookAsync([FromBody] CreateBookDto createBookDto)
         {
-            if (await authorService.GetByIdAsync(bookDto.AuthorId) is null)
-                return NotFound("Author is not found");
-
-            await bookService.CreateAsync(bookDto.Title, bookDto.PublishedYear, bookDto.AuthorId);
-            return NoContent();
+            var res = await bookService.CreateAsync(createBookDto);
+            return Ok(res);
         }
         [HttpPut]
         [Route("{id:int}")]
-        public async Task<IActionResult> UpdateBookAsync([FromRoute] int id, [FromBody] BookDto bookDto)
+        public async Task<IActionResult> UpdateBookAsync([FromRoute] int id, [FromBody] CreateBookDto createBookDto)
         {
-            if (await bookService.GetByIdAsync(id) is null)
-                return NotFound("Book is not found");
-
-            if (await authorService.GetByIdAsync(bookDto.AuthorId) is null)
-                return NotFound("Author is not found");
-
-            await bookService.UpdateAsync(id, bookDto.Title, bookDto.PublishedYear, bookDto.AuthorId);
-            return NoContent();
+            var res = await bookService.UpdateAsync(id, createBookDto);
+            return Ok(res);
         }
         [HttpDelete]
         [Route("{id:int}")]
         public async Task<IActionResult> DeleteBookAsync([FromRoute] int id)
         {
-            if (await bookService.GetByIdAsync(id) is null)
-                return NotFound();
-
             await bookService.DeleteAsync(id);
             return NoContent();
         }

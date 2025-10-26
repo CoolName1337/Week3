@@ -1,8 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace LibraryApi.Dtos
+namespace BusinessLayer.Dtos
 {
-    public class BookDto
+    public class CreateBookDto
     {
         [Required(ErrorMessage = "The title is required")]
         public string Title { get; set; }

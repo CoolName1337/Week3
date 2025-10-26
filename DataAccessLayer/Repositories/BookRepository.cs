@@ -1,6 +1,6 @@
-﻿using DataAccessLayer.Models;
+﻿using DataAccessLayer.Entities;
 
-namespace DataAccessLayer
+namespace DataAccessLayer.Repositories
 {
     internal class BookRepository : IRepository<Book>
     {
@@ -12,12 +12,13 @@ namespace DataAccessLayer
                 new() { Id = 3, Title = "Title3", PublishedYear = 1898, AuthorId = 1},
                 new() { Id = 4, Title = "Title4", PublishedYear = 4812, AuthorId = 2},
         ];
-        public async Task CreateAsync(Book obj)
+        public async Task<Book> CreateAsync(Book obj)
         {
-            await Task.Run(() =>
+            return await Task.Run(() =>
             {
                 obj.Id = _books.OrderBy(book => book.Id).Last().Id + 1;
                 _books.Add(obj);
+                return obj;
             });
         }
 
@@ -26,20 +27,31 @@ namespace DataAccessLayer
             await Task.Run(() => _books.Remove(obj));
         }
 
-        public async Task<IEnumerable<Book>?> GetAllAsync()
+        public async Task<IEnumerable<Book>> GetAllAsync()
         {
             return await Task.Run(_books.ToArray);
         }
 
-        public async Task<Book?> GetByIdAsync(int id)
+        public async Task<Book> GetByIdAsync(int id)
         {
             return await Task.Run(() => _books.FirstOrDefault(b => b.Id == id));
         }
 
-        public async Task UpdateAsync(Book obj)
+        public async Task<Book?> UpdateAsync(Book obj)
         {
-            //Так как ссылочные типа и все такое то тут смысла нет даже
-            await Task.Delay(10);
+            return await Task.Run(() =>
+            {
+                var bookFromList = _books.FirstOrDefault(b => b.Id == obj.Id);
+
+                if (bookFromList is null)
+                    return null;
+
+                bookFromList.PublishedYear = obj.PublishedYear;
+                bookFromList.Title = obj.Title;
+                bookFromList.AuthorId = obj.AuthorId;
+
+                return bookFromList;
+            });
         }
     }
 }

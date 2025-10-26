@@ -1,5 +1,6 @@
 using BusinessLayer;
 using DataAccessLayer;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace LibraryApi
 {
@@ -9,6 +10,7 @@ namespace LibraryApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddControllers();
             builder.Services.AddSwaggerGen();
             builder.Services.AddDataLogic();
@@ -16,12 +18,13 @@ namespace LibraryApi
 
             var app = builder.Build();
 
-            app.UseSwagger();
-            app.UseSwaggerUI();
 
-            app.UseDeveloperExceptionPage();    
+            app.UseSwagger();
+            app.UseSwaggerUI(); 
 
             app.UseHttpsRedirection();
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.MapControllers();
             
             app.Run();

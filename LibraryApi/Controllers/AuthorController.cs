@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using BusinessLayer;
-using LibraryApi.Dtos;
+using LibraryApi.ViewModels;
+using BusinessLayer.Dtos;
+using BusinessLayer.Exceptions;
+using BusinessLayer.Services;
 
 namespace LibraryApi.Controllers
 {
@@ -19,34 +21,26 @@ namespace LibraryApi.Controllers
         public async Task<IActionResult> GetAuthorByIdAsync([FromRoute] int id)
         {
             var author = await authorService.GetByIdAsync(id);
-            if(author is null)
-                return NotFound();
             return Ok(author);
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostAuthorAsync([FromBody] AuthorDto authorDto)
+        public async Task<IActionResult> PostAuthorAsync([FromBody] CreateAuthorDto createAuthorDto)
         {
-            await authorService.CreateAsync(authorDto.Name, authorDto.DateOfBirth);
-            return NoContent();
+            var res = await authorService.CreateAsync(createAuthorDto);
+            return Ok(res);
         }
         [HttpPut]
         [Route("{id:int}")]
-        public async Task<IActionResult> UpdateAuthorAsync([FromRoute] int id, [FromBody] AuthorDto authorDto)
+        public async Task<IActionResult> UpdateAuthorAsync([FromRoute] int id, [FromBody] CreateAuthorDto createAuthorDto)
         {
-            if (await authorService.GetByIdAsync(id) is null)
-                return NotFound();
-
-            await authorService.UpdateAsync(id, authorDto.Name, authorDto.DateOfBirth);
-            return NoContent();
+            var res = await authorService.UpdateAsync(id, createAuthorDto);
+            return Ok(res);
         }
         [HttpDelete]
         [Route("{id:int}")]
         public async Task<IActionResult> DeleteAuthorAsync([FromRoute] int id)
         {
-            if (await authorService.GetByIdAsync(id) is null)
-                return NotFound();
-
             await authorService.DeleteAsync(id);
             return NoContent();
         }
