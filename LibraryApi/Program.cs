@@ -1,6 +1,6 @@
 using BusinessLayer;
-using DataAccessLayer;
-using Microsoft.Extensions.DependencyInjection;
+using DataAccessEFLayer;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryApi
 {
@@ -10,6 +10,10 @@ namespace LibraryApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddDbContext<LibraryDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
             builder.Services.AddAutoMapper(typeof(MappingProfile));
             builder.Services.AddControllers();
             builder.Services.AddSwaggerGen();
@@ -18,6 +22,11 @@ namespace LibraryApi
 
             var app = builder.Build();
 
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<LibraryDbContext>();
+                db.Database.Migrate();
+            }
 
             app.UseSwagger();
             app.UseSwaggerUI(); 

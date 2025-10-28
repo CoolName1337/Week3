@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace BusinessLayer.Dtos
 {
-    public class CreateBookDto
+    public class UpdateBookDto
     {
+        public int Id { get; set; }
         [Required(ErrorMessage = "The title is required")]
         public string Title { get; set; }
         [Required(ErrorMessage = "The publication year is required")]

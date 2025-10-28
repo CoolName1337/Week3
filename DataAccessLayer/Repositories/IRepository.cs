@@ -1,5 +1,4 @@
-﻿using DataAccessLayer.Entities;
-
+﻿
 namespace DataAccessLayer.Repositories
 {
     public interface IRepository<T>

@@ -2,8 +2,9 @@
 
 namespace BusinessLayer.Dtos
 {
-    public class CreateAuthorDto
+    public class UpdateAuthorDto
     {
+        public int Id { get; set; } 
         [Required(ErrorMessage = "The author's name is required")]
         public string Name { get; set; }
 

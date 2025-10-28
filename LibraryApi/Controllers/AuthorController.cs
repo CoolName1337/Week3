@@ -31,10 +31,9 @@ namespace LibraryApi.Controllers
             return Ok(res);
         }
         [HttpPut]
-        [Route("{id:int}")]
-        public async Task<IActionResult> UpdateAuthorAsync([FromRoute] int id, [FromBody] CreateAuthorDto createAuthorDto)
+        public async Task<IActionResult> UpdateAuthorAsync([FromBody] UpdateAuthorDto updateAuthorDto)
         {
-            var res = await authorService.UpdateAsync(id, createAuthorDto);
+            var res = await authorService.UpdateAsync(updateAuthorDto);
             return Ok(res);
         }
         [HttpDelete]
@@ -44,5 +43,13 @@ namespace LibraryApi.Controllers
             await authorService.DeleteAsync(id);
             return NoContent();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAuthorsByFilterAsync([FromQuery] AuthorFilterDto filter)
+        {
+            var authors = await authorService.GetByFilterAsync(filter);
+            return Ok(authors);
+        }
+
     }
 }

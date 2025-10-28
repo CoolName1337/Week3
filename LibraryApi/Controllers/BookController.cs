@@ -29,10 +29,9 @@ namespace LibraryApi.Controllers
             return Ok(res);
         }
         [HttpPut]
-        [Route("{id:int}")]
-        public async Task<IActionResult> UpdateBookAsync([FromRoute] int id, [FromBody] CreateBookDto createBookDto)
+        public async Task<IActionResult> UpdateBookAsync([FromBody] UpdateBookDto updateBookDto)
         {
-            var res = await bookService.UpdateAsync(id, createBookDto);
+            var res = await bookService.UpdateAsync(updateBookDto);
             return Ok(res);
         }
         [HttpDelete]
@@ -41,6 +40,11 @@ namespace LibraryApi.Controllers
         {
             await bookService.DeleteAsync(id);
             return NoContent();
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetBooksByFilterAsync([FromQuery] BookFilterDto bookFilterDto)
+        {
+            return Ok(await bookService.GetByFilterAsync(bookFilterDto));
         }
     }
 }
