@@ -21,16 +21,6 @@ namespace DataAccessEFLayer.Repositories
             return await _db.Books.AsNoTracking().ToListAsync();
         }
 
-        public async Task<IEnumerable<Book>> GetBooksAfterYearAsync(int year)
-        {
-            return await _db.Books.AsNoTracking().Include(b => b.Author).Where(b => b.PublishedYear >= year).ToListAsync();
-        }
-
-        public IQueryable<Book> GetBooksByName(string name)
-        {
-            return _db.Books.AsNoTracking().Include(b => b.Author).Where(b=>b.Title.StartsWith(name));
-        }
-
         public async Task<Book?> GetByIdAsync(int id)
         {
             return await _db.Books.AsNoTracking().Include(b => b.Author).FirstOrDefaultAsync(b => b.Id == id);
@@ -46,14 +36,33 @@ namespace DataAccessEFLayer.Repositories
             _db.Books.Update(obj);
         }
 
-        public IQueryable<Book> GetBooksByTitle(string name)
+        public async Task<IEnumerable<Book>> GetBooksByTitleAsync(string name)
         {
-            return _db.Books.Where(b => b.Title.Contains(name));
+            return await _db.Books.AsNoTracking().Where(b => b.Title.Contains(name)).ToListAsync();
         }
 
-        public IQueryable<Book> GetBooksByAuthorId(int authorId)
+        public async Task<IEnumerable<Book>> GetBooksByAuthorIdAsync(int authorId)
         {
-           return _db.Books.Where(b=>b.AuthorId == authorId);
+            return await _db.Books.AsNoTracking().Where(b => b.AuthorId == authorId).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Book>> GetByFilterAsync(BookRepoFilter filter)
+        {
+            var q = _db.Books.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filter.BookTitle))
+                q = q.Where(b => b.Title.Contains(filter.BookTitle));
+
+            if (filter.AuthorId is int id)
+                q = q.Where(b => b.AuthorId == id);
+
+            if (!string.IsNullOrWhiteSpace(filter.AuthorName))
+                q = q.Include(b => b.Author).Where(b => b.Author.Name.Contains(filter.AuthorName));
+
+            if (filter.PublishedAfter is int publishedfter)
+                q = q.Where(b => b.PublishedYear > publishedfter);
+
+            return await q.AsNoTracking().ToListAsync();
         }
     }
 }

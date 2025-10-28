@@ -36,9 +36,9 @@ namespace DataAccessEFLayer.Repositories
             _db.Authors.Update(obj);
         }
 
-        public IQueryable<Author> GetAuthorsByName(string name)
+        public async Task<IEnumerable<Author>> GetAuthorsByNameAsync(string name)
         {
-            return _db.Authors.AsNoTracking().Where(a => a.Name.Contains(name)).Include(a => a.Books);
+            return await _db.Authors.AsNoTracking().Where(a => a.Name.Contains(name)).Include(a => a.Books).ToListAsync();
         }
 
         public async Task<Author?> GetAuthorByBookIdAsync(int id)
@@ -46,5 +46,23 @@ namespace DataAccessEFLayer.Repositories
             return await _db.Authors.AsNoTracking().Include(a => a.Books).FirstOrDefaultAsync(a => a.Books.Any(b => b.Id == id));
         }
 
+        public async Task<IEnumerable<Author>> GetByFilterAsync(AuthorRepoFilter filter)
+        {
+            var q = _db.Authors.Include(a=>a.Books).AsQueryable();
+
+            if (!string.IsNullOrEmpty(filter.AuthorName))
+                q = q.Where(a => a.Name.Contains(filter.AuthorName));
+
+            if (!string.IsNullOrEmpty(filter.BookTitle))
+                q = q.Where(a => a.Books.Any(b => b.Title.Contains(filter.BookTitle)));
+
+            if (filter.BirthAfter is DateOnly afterDate)
+                q = q.Where(a => a.DateOfBirth > afterDate);
+
+            if (filter.BookId is int bookId)
+                q = q.Where(a => a.Books.Any(b=>b.Id == bookId));
+
+            return await q.AsNoTracking().ToListAsync();
+        }
     }
 }

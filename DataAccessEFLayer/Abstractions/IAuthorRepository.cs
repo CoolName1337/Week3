@@ -4,7 +4,9 @@ namespace DataAccessEFLayer.Abstractions
 {
     public interface IAuthorRepository : IRepository<Author>
     {
-        public IQueryable<Author> GetAuthorsByName(string name);
+        public Task<IEnumerable<Author>> GetAuthorsByNameAsync(string name);
         public Task<Author?> GetAuthorByBookIdAsync(int bookId);
+
+        public Task<IEnumerable<Author>> GetByFilterAsync(AuthorRepoFilter filter);
     }
 }
